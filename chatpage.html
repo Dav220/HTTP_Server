@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat Room</title>
+  <style>
+    #chat-window {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 400px;
+      width: 100%;
+      overflow-y: auto;
+      background: #f9f9f9;
+      margin-bottom: 10px;
+    }
+    .message {
+      margin: 10px 0;
+      padding: 5px;
+      background: #e0f7fa;
+      border-radius: 5px;
+    }
+    textarea {
+      width: 100%;
+      height: 80px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Chat Window</h2>
+  <div id="chat-window"></div>
+
+  <form id="chat-form">
+    <textarea id="message" placeholder="Type your message here..."></textarea><br>
+    <input type="file" id="image" accept="image/*"><br><br>
+    <button type="submit">Post</button>
+  </form>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const username = urlParams.get('username') || 'Anonymous';
+    const chatWindow = document.getElementById('chat-window');
+    const chatForm = document.getElementById('chat-form');
+    const messageInput = document.getElementById('message');
+    const imageInput = document.getElementById('image');
+
+    chatForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const text = messageInput.value.trim();
+      const imageFile = imageInput.files[0];
+
+      if (!text && !imageFile) return;
+
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message';
+      msgDiv.innerHTML = `<strong>${username}:</strong><br>${text.replace(/\n/g, '<br>')}`;
+
+      if (imageFile) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.style.maxWidth = '200px';
+          img.style.display = 'block';
+          msgDiv.appendChild(img);
+          chatWindow.appendChild(msgDiv);
+          chatWindow.scrollTop = chatWindow.scrollHeight;
+        };
+        reader.readAsDataURL(imageFile);
+      } else {
+        chatWindow.appendChild(msgDiv);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+      }
+
+      messageInput.value = '';
+      imageInput.value = '';
+    });
+  </script>
+</body>
+</html>
